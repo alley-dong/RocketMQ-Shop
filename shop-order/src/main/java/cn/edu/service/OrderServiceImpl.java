@@ -115,7 +115,10 @@ public class OrderServiceImpl {
             return -1;
         }
     }
-    //生成订单
+
+    /**
+     * 生成订单
+     */
     public int MQShopOrder(ShopOrder shopOrder) throws Exception {
         //TODO 使用Gson序列化
         Gson gson = new Gson();
@@ -130,14 +133,17 @@ public class OrderServiceImpl {
         }
     }
 
-    //生成限时订单
+    /**
+     * 生成限时订单
+     */
     public int MQDelayOrder(ShopOrder shopOrder) throws Exception {
         //TODO 使用Gson序列化
         Gson gson = new Gson();
         String txtMsg = gson.toJson(shopOrder);
         Message message = new Message("delayOrder","",shopOrder.getOrderId().toString(),txtMsg.getBytes());
         // delayTimeLevel：(1~18个等级)"1s 5s 10s 30s 1m 2m 3m 4m 5m 6m 7m 8m 9m 10m 20m 30m 1h 2h"
-        message.setDelayTimeLevel(5);//1分钟不支付，就触发延时消息，就会把订单置为无效，还有回退。。。。
+        // 1分钟不支付，就触发延时消息，就会把订单置为无效，还有回退。。。。
+        message.setDelayTimeLevel(5);
         SendResult sendResult = rocketMQTemplate.getProducer().send(message);
         if(sendResult.getSendStatus() == SendStatus.SEND_OK){
             return  1;
